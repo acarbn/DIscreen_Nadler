@@ -1,0 +1,3 @@
+*.pickle
+/input_data/*.csv
+/todo
