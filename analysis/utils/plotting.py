@@ -10,7 +10,6 @@ sns.set_style("ticks", rc={'font.family':'sans-serif', 'font.sans-serif':'Droid 
 plt.style.use('./utils/domain_ins.mplstyle')
 plt.rcParams['svg.fonttype'] = 'none'
 
-
 def r(x, y):
     return stats.pearsonr(x, y)[0]
 
@@ -59,9 +58,7 @@ def create_enrichment_fig(data_norm_1, data_norm_2, combination, condition, prot
     plt.show()
     plt.close()
 
-
 def create_fold_change_fig(data, misc, combination, condition, prot_dict, out_folder):
-    #plt.clf()
     plt.figure(figsize=(10,3.5))
     sns.set_context(rc = {'patch.linewidth': 0.0})
     clrs = ['grey' if (x+1 in misc) else '#E60234' for x in range(len(data))]
@@ -101,70 +98,41 @@ def correlation_plot(data, combination, condition, out_folder):
     plt.show()
     plt.close()
 
-def color_map_color(value, cmap_name='viridis', vmin=0, vmax=1):
-    '''
-    color map for protein depiction
-    '''
-    # norm = plt.Normalize(vmin, vmax)
-    norm = plt.colors.Normalize(vmin=vmin, vmax=vmax)
-    cmap = cm.get_cmap(cmap_name)  # PiYG
-    rgb = cmap(norm(value))[:3]  # will return rgba, we take only first 3 so we get rgb
-    color = plt.colors.rgb2hex(rgb)
-    return color
-
-'''
-def correlation_plot(data, combination, property):
-    data = data.loc[data[property].notna()]
+def feature_correlation_plot(data, combination, property, fig_folder):
     plt.figure(figsize=(5,5))
     plt.rcParams['axes.linewidth'] = 2
-    g = sns.lmplot(data=data, x=property, y='enrichment', hue='variable', palette={'norm':'#008080'}, ci=None, 
-        scatter_kws={'alpha':.3, 'linewidth':0}, line_kws={'alpha':1})
-    plt.xlabel(property)
-    plt.ylabel("Log2 variant enrichment")
-    sns.despine()
-    g._legend.remove()
-    plt.title(f"Correlation between enrichment and {property}: {combination}")
-    for ax in g.axes.flat:
-        ax.yaxis.set_tick_params(width=2)
-        ax.xaxis.set_tick_params(width=2)
-    #plt.savefig(f"{in_folder}/coverage_plots/log_transformed/correlation_{combination}_{condition[0][1:]}.png")
-'''
-def swarm_plot(data, combination, property):
-    data = data.loc[data[property].notna()]
-    plt.figure(figsize=(5,5))
     plt.rcParams['axes.linewidth'] = 2
-    ax = sns.boxplot(data=data, x=property, y='enrichment', linewidth=2, color='white', fliersize=0)
-    ax = sns.swarmplot(data=data, x=property, y='enrichment', alpha=.5, linewidth=0, color='grey')
-    plt.setp(ax.lines, color="0")
-    plt.xlabel(property)
-    plt.ylabel("Log2 variant enrichment")
-    sns.despine()
-    plt.title(f"Correlation between enrichment and {property}: {combination}")
-    ax.yaxis.set_tick_params(width=2)
-    ax.xaxis.set_tick_params(width=2)
-    #plt.savefig(f"{in_folder}/coverage_plots/log_transformed/correlation_{combination}_{condition[0][1:]}.png")
-
-map = sns.diverging_palette(170, 260, s=60, as_cmap=True)
-
-def pairwise_correlation(data, name, out_folder):
-    sns.set(font_scale = 2)
+    g = sns.regplot(data=data, x=property, y='enrichment', color='grey', ci=None, 
+        scatter_kws={'alpha':.5, 'linewidth':0}, line_kws={"linewidth":0, 
+        'label':f"Spearman's r: {round(r(data[property], data['enrichment']), 2)}"})
     
-    data = data.corr(method='pearson')
-    plt.figure(figsize=(10,10))
+    plt.xlabel(property)
+    plt.ylabel("Log2 variant enrichment")
+    sns.despine()
+    g.tick_params(width=2)
+    g.legend(frameon=False, loc='upper right')
+    plt.title(f"{combination}", y=1.03)
+    plt.savefig(f"{fig_folder}/correlation_{combination}_{property}.svg")
+
+def violin_plot(data, combination, property, fig_folder):
+    data = data.loc[data[property].notna()]
+    plt.figure(figsize=(5,5))
     plt.rcParams['axes.linewidth'] = 2
-    ax = sns.heatmap(data=data, cmap='mako', cbar_kws={'label': "pearson's r"}, square=True)
-    plt.title(f"Correlation between enrichments: {name}")
-    for _, spine in ax.spines.items():
-        spine.set_visible(True)
-        spine.set_linewidth(2)
+    ax = sns.violinplot(data=data, x=property, y='enrichment', linewidth=2, color='grey', fliersize=0)
+    plt.setp(ax.lines, color="0")
+    plt.xlabel(property.replace('_', ' '))
+    plt.ylabel("Log2 variant enrichment")
+    sns.despine()
+    plt.title(f"{combination}")
     ax.yaxis.set_tick_params(width=2)
     ax.xaxis.set_tick_params(width=2)
-    plt.savefig(f"{out_folder}/figures/{name}_correlation-1.svg")
-'''
-def pairwise_correlation(data, name, method = 'pearson'):
-    sns.set_style("ticks")
-    sns.set(font_scale = 1)
+    ax.set_xticklabels(['Coil', 'Helix', 'Sheet'])
+    plt.savefig(f"{fig_folder}/correlation_{combination}_{property}.svg")
+
+map = sns.diverging_palette(10, 250, s=100, l=25, as_cmap=True)
+def pairwise_correlation(data, name, fig_folder, method = 'pearson'):
     data = data.corr(method=method)
+    data.columns = data.columns.str.replace('_',' ')
     plt.figure(figsize=(10,10))
     ax = sns.heatmap(data=data, cmap=map, cbar_kws={'label': f"{method}'s r"}, square=True, vmin=-1, vmax=1)
     plt.title(f"Correlation between enrichments: {name}")
@@ -173,10 +141,10 @@ def pairwise_correlation(data, name, method = 'pearson'):
         spine.set_linewidth(2)
     ax.yaxis.set_tick_params(width=2)
     ax.xaxis.set_tick_params(width=2)
-    #plt.savefig(f"{in_folder}/coverage_plots/correlations/feature_correlation_{name}.png", bbox_inches="tight")
+    plt.savefig(f"{fig_folder}/feature_correlation_{name}.svg", bbox_inches="tight")
     plt.show()
     plt.close()
-'''
+
 def create_switch_fig(data, out_folder):
     data = data.fillna(0)
     plt.figure(figsize=(10,3)) 
@@ -207,7 +175,6 @@ def create_switch_fig(data, out_folder):
     ax.yaxis.set_tick_params(width=2, which='both')
     ax.xaxis.set_tick_params(width=2)
     plt.xticks(ticks= np.arange(0, 292, 20.0), labels=labels)
-    #plt.xlim(left=100, right=120)
     plt.ylim(bottom=-7.5, top=4)
     sns.despine(top=True, right=True)
     plt.savefig(f"{out_folder}/figures/AraC_switch-1.svg")

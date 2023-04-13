@@ -195,7 +195,7 @@ def process_alignment(alignment_file, uniprot_query):
     alignment_file: file with the MSA
     uniprot_query: Name of the reference protein within the file (usually the uniprot ID)
     '''
-    fasta_alignment = SeqIO.parse(open(f'/work/projects/project01640/jm/domain_insertion/20220328_NGS_enriched-2/MSAs/{uniprot_query}_ref_aln.afa'),'fasta')
+    fasta_alignment = SeqIO.parse(open(f'/work/projects/project01640/jm/domain_insertion/20220328_NGS_enriched-2/MSAs/{uniprot_query}_ref_aln.afa'),'fasta')  #TODO: relative wd
     alignment_dict = {}
     for i in fasta_alignment:
         alignment_dict[i.name] = str(i.seq)
@@ -326,7 +326,7 @@ class plot_prec_rec():
         self.ax.legend(loc='center', bbox_to_anchor=(0.5, -.3), ncol=2)
         self.ax.set_aspect('equal')
         #self.ax.legend(loc="lower right")
-        plt.savefig(f"/work/projects/project01640/jm/domain_insertion/dipSeq/batch_scripts_JMA/scripts_paper/figures/RP_{title_text}.svg")
+        plt.savefig(f"/work/projects/project01640/jm/domain_insertion/DI_screen/analysis/figures/RP_{title_text}.svg")  #TODO: relative wd
         plt.show()
 
     def forward(self): 
@@ -376,7 +376,7 @@ def plot_auroc(classifier, data_split, X, y, title_text):
     ax.set(ylim=(0, 1.01), xlim=(-.02, 1))
     ax.set_aspect('equal')
     ax.legend(loc="lower right")
-    plt.savefig(f"/work/projects/project01640/jm/domain_insertion/dipSeq/batch_scripts_JMA/scripts_paper/figures/AUROC_{title_text}.svg")
+    plt.savefig(f"/work/projects/project01640/jm/domain_insertion/DI_screen/analysis/figures/AUROC_{title_text}.svg") #TODO: relative wd
 
 def plot_auroc_custom(classifier, data_split, groups, X, y, title_text):
     # Run classifier with cross-validation and plot ROC curves
@@ -423,27 +423,6 @@ def plot_auroc_custom(classifier, data_split, groups, X, y, title_text):
     )
     ax.legend(loc="lower right")
     plt.show()
-
-def metrics_test(classifier, X_train, y_train, X_test, y_test, title_text):
-    # Run classifier with cross-validation and plot ROC curves
-    tprs = []
-    aucs = []
-    mean_fpr = np.linspace(0, 1, 100)
-
-    classifier.fit(X_train, y_train)
-    fig, ax = plt.subplots(1,2,figsize=(11,5))
-    viz = RocCurveDisplay.from_estimator(classifier, X_test, y_test, name=f'ROC testset', alpha=1, lw=3, ax=ax[0], color='#87001D')
-    ax[0].fill_between(viz.fpr, viz.tpr, alpha=.2, color="#87001D")
-    ax[0].set(ylim=(0, 1.01), xlim=(-.02, 1))
-    ax[0].set_aspect('equal')
-    ax[0].legend(loc="lower right")
-    
-    viz = PrecisionRecallDisplay.from_estimator(classifier, X_test, y_test, name=f'AP fold', alpha=1, lw=3, ax=ax[1], color='#7582FF')
-    ax[1].fill_between(viz.recall, viz.precision, step='post', alpha=.2, color='#7582FF')
-    ax[1].set(ylim=(0, 1.01), xlim=(0, 1))
-    ax[1].set_aspect('equal')
-    ax[1].legend(loc="lower right")
-    plt.savefig(f"/work/projects/project01640/jm/domain_insertion/dipSeq/batch_scripts_JMA/scripts_paper/figures/metrics_test_set{title_text}.svg")
 
 def collect_training_data(radius, alignment, name, feat_dict_radius, feat_dict_sequential, primary_proteins, analysis_dict, wd):
     parser = PDBParser()

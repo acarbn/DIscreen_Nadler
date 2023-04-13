@@ -4,13 +4,11 @@ from utils.processing import *
 from sklearn.model_selection import train_test_split
 import matplotlib.pyplot as plt
 import pandas as pd
-from sklearn.model_selection import cross_validate, cross_val_score, KFold
+from sklearn.model_selection import cross_validate
 from sklearn.model_selection import GridSearchCV
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.model_selection import StratifiedKFold
-from sklearn import svm, linear_model, ensemble
-from sklearn.neural_network import MLPClassifier, MLPRegressor
-from sklearn.ensemble import RandomForestRegressor
+from sklearn import ensemble
 
 
 # set styles
@@ -102,6 +100,3 @@ class Classifier:
     def metrics(self):
         plot_auroc(self.clf, data_split=self.kf, X=self.X_train, y=self.y_train, title_text=self.title_text)
         plot_prec_rec(self.clf, data_split=self.kf, X=self.X_train, y=self.y_train, title_text=self.title_text, groups=None).forward()
-    
-    def metrics_testset(self):
-        metrics_test(self.clf, self.X_train, self.y_train, self.X_test, self.y_test, self.title_text)
