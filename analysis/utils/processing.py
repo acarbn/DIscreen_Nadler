@@ -45,7 +45,7 @@ def process_input(input):
 def process_enriched(input_enriched):
     '''
     processing of the final enriched libraries
-    all positions that disappear completely will are set to -10
+    all positions that disappeared completely during the screen are set to -10
     '''
     data_cond = pd.read_csv(input_enriched, delimiter=',')
     data_cond.insertion_site = data_cond.insertion_site/3
@@ -90,8 +90,8 @@ def get_Sec_struct(structure, name, wd):
 
 def get_surface_accessibility(dssp, name, window, property_dict):
     '''
-    Extracts the surface accessibility  (which is stored in the same variable) for the given 'structure'
-    Averages the surface accessibility around within the window
+    extract the surface accessibility (which is stored in the same variable) for the given 'structure'
+    average the surface accessibility within the window
     '''
     surface = []
     for i in dssp.property_list:
@@ -108,8 +108,8 @@ def get_surface_accessibility(dssp, name, window, property_dict):
 
 def get_pLDDT(structure, window, property_dict):
     '''
-    Extracts the b-factor or pLDDT score (which is stored in the same variable) for the given 'structure'
-    Averages the b-factor around within the window
+    extract the b-factor or pLDDT score (which is stored in the same variable) for the given structure
+    average the b-factor within the window
     '''
     #get b factor
     pLDDT = []
@@ -170,9 +170,9 @@ def apply_features(input_features, protein_seq, property_dict, window,  prox_mod
 
 def find_proximal_AAs(property_dict, radius):
     '''
-    defines insertion site as the middle between the c-alphas of the residues between which a domain is inserted.
-    stores proximal residues of each position.
-    Proximal residues are defined as the residues the c-alpha of which is located within the given radius (angstrom).
+    defines insertion site as the middle of the c-alphas of the residues between which a domain is inserted.
+    stores proximal residues for each position.
+    proximal residues are defined as the residues the c-alpha of which is located within the given radius (angstrom).
     '''
     residues = [r for r in property_dict['structure'].get_residues()]
     property_dict['prox_AAs'] = []
@@ -189,13 +189,13 @@ def find_proximal_AAs(property_dict, radius):
                 property_dict['prox_AAs'][r1].append(r2)
     return property_dict
 
-def process_alignment(alignment_file, uniprot_query):
+def process_alignment(base_path, uniprot_query):
     '''
     import and process alignment
     alignment_file: file with the MSA
     uniprot_query: Name of the reference protein within the file (usually the uniprot ID)
     '''
-    fasta_alignment = SeqIO.parse(open(f'/work/projects/project01640/jm/domain_insertion/20220328_NGS_enriched-2/MSAs/{uniprot_query}_ref_aln.afa'),'fasta')  #TODO: relative wd
+    fasta_alignment = SeqIO.parse(open(f'{base_path}/analysis/input_data/MSA/{uniprot_query}_ref_aln.afa'),'fasta')  #TODO: relative wd
     alignment_dict = {}
     for i in fasta_alignment:
         alignment_dict[i.name] = str(i.seq)
@@ -210,7 +210,7 @@ def process_alignment(alignment_file, uniprot_query):
 
 def KLD(alignment_counts, background, query):
     '''
-    Calculates the Kullback-Leibler-Divergence for each position of the query protein
+    calculate the Kullback-Leibler-Divergence for each position of the query protein
     '''
     entropy = []
     for idx, values in alignment_counts.T.iterrows():
@@ -226,8 +226,8 @@ def KLD(alignment_counts, background, query):
 
 def insertion_stats(query_idx, primary_AA, property_dict):
     '''
-    Calculates the insertion frequencies from pairwise alignments between the wildtype sequence and inputs
-    The degree of relation to which the sequences are taken into account can be varied by changing the alugnments[0][2] cutoff
+    calculate the insertion frequencies from pairwise alignments between the wildtype sequence and inputs
+    the degree of relation to which the sequences are taken into account can be varied by changing the alignments[0][2] cutoff
     '''
     matrix = matlist.blosum62
     insertions = [0]*len(query_idx)
@@ -263,7 +263,7 @@ def insertion_stats(query_idx, primary_AA, property_dict):
 
 def one_hot_insertion(seq, alphabet = 'ACDEFGHIKLMNPQRSTVWY'):
     '''
-    one-hot encoding of AA stings
+    one-hot encoding of AA strings
     '''
     # mapping of AAs to integers
     AA_to_int = dict((c, i) for i, c in enumerate(alphabet))
@@ -284,7 +284,7 @@ def one_hot_insertion(seq, alphabet = 'ACDEFGHIKLMNPQRSTVWY'):
 
 class plot_prec_rec():
     '''
-    Run classifier with cross-validation and plot ROC curves
+    run classifier with cross-validation and plot ROC curves
     '''
     def __init__(self, classifier, data_split, X, y, title_text, groups):
         self.classifier = classifier
@@ -326,7 +326,7 @@ class plot_prec_rec():
         self.ax.legend(loc='center', bbox_to_anchor=(0.5, -.3), ncol=2)
         self.ax.set_aspect('equal')
         #self.ax.legend(loc="lower right")
-        plt.savefig(f"/work/projects/project01640/jm/domain_insertion/DI_screen/analysis/figures/RP_{title_text}.svg")  #TODO: relative wd
+        plt.savefig(f"/mnt/disk1/jan/DI_screen/analysis/figures/RP_{title_text}.svg")  #TODO: relative wd
         plt.show()
 
     def forward(self): 
@@ -335,7 +335,7 @@ class plot_prec_rec():
 
 def plot_auroc(classifier, data_split, X, y, title_text):
     '''
-    Run classifier with cross-validation and plot ROC curves
+    run classifier with cross-validation and plot ROC curves
     '''
     tprs = []
     aucs = []
@@ -376,7 +376,7 @@ def plot_auroc(classifier, data_split, X, y, title_text):
     ax.set(ylim=(0, 1.01), xlim=(-.02, 1))
     ax.set_aspect('equal')
     ax.legend(loc="lower right")
-    plt.savefig(f"/work/projects/project01640/jm/domain_insertion/DI_screen/analysis/figures/AUROC_{title_text}.svg") #TODO: relative wd
+    plt.savefig(f"/mnt/disk1/jan/DI_screen/analysis/figures/AUROC_{title_text}.svg") #TODO: relative wd
 
 def plot_auroc_custom(classifier, data_split, groups, X, y, title_text):
     # Run classifier with cross-validation and plot ROC curves

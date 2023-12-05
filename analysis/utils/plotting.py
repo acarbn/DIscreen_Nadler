@@ -14,8 +14,6 @@ def r(x, y):
     return stats.pearsonr(x, y)[0]
 
 def create_enrichment_fig(data_norm_1, data_norm_2, combination, condition, prot_dict, out_folder):
-    #plt.clf()
-    #print(data_norm_1, data_norm_2)
     plt.figure(figsize=(10,3))
     sns.set_context(rc = {'patch.linewidth': 0.0}) 
     try:
@@ -134,7 +132,7 @@ def pairwise_correlation(data, name, fig_folder, method = 'pearson'):
     data = data.corr(method=method)
     data.columns = data.columns.str.replace('_',' ')
     plt.figure(figsize=(10,10))
-    ax = sns.heatmap(data=data, cmap=map, cbar_kws={'label': f"{method}'s r"}, square=True, vmin=-1, vmax=1)
+    ax = sns.heatmap(data=data, cmap='mako', cbar_kws={'label': f"{method}'s r"}, square=True)
     plt.title(f"Correlation between enrichments: {name}")
     for _, spine in ax.spines.items():
         spine.set_visible(True)

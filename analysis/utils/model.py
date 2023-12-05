@@ -28,7 +28,7 @@ plt.rcParams['lines.markeredgewidth'] = 1.5
 class Classifier:
     '''
     trains a gradient boosting classifier
-    protein_seq: the sequenc of the candidate protein, which will be one-hot encoded
+    protein_seq: the sequence of the candidate protein, which will be one-hot encoded
     property_dict: a dict containing different protein properties that should be taken into account
     The data is scaled prior to the model fit
     '''
@@ -60,8 +60,7 @@ class Classifier:
         self.dataset = self.dataset.dropna()
         self.enrichment = self.dataset['log'].copy()
         self.dataset= self.dataset.drop(columns=['log'])
-        # self.dataset.drop(columns=['log'], inplace=True)
-        
+
         # Train-test-split
         self.X_train, self.X_test, self.y_train, self.y_test = train_test_split(self.dataset, self.enrichment.squeeze(), test_size=0.2, random_state=42)
         
