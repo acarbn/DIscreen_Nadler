@@ -1,0 +1,14 @@
+lines.linewidth : 1.5
+lines.color : black
+axes.linewidth : 1.5
+axes.spines.top : False
+axes.spines.right : False
+legend.frameon : False
+xtick.major.width : 1.5
+xtick.bottom : True
+ytick.left : True
+ytick.major.width : 1.5
+lines.markeredgewidth : 1.5
+font.family : sans-serif
+font.sans-serif : Cantarell
+font.size: 14
